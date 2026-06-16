@@ -7,7 +7,11 @@ from rest_framework import serializers
 from core.constants import BOOLEAN, INTEGER
 from features.constants import CONTROL_VARIANT_KEY, RESERVED_VARIANT_KEY_MESSAGE
 from features.models import Feature, FeatureState
-from features.multivariate.models import MultivariateFeatureOption
+from features.multivariate.models import (
+    INVALID_PERCENTAGE_ALLOCATION_MESSAGE,
+    MultivariateFeatureOption,
+    validate_feature_state_percentage_allocation,
+)
 
 
 class NestedMultivariateFeatureOptionSerializer(serializers.ModelSerializer):  # type: ignore[type-arg]
@@ -79,8 +83,9 @@ class MultivariateFeatureOptionSerializer(NestedMultivariateFeatureOptionSeriali
 
     def validate(self, attrs):  # type: ignore[no-untyped-def]
         attrs = super().validate(attrs)
+        feature = attrs["feature"]
         total_sibling_percentage_allocation = (
-            self._get_siblings(attrs["feature"]).aggregate(
+            self._get_siblings(feature).aggregate(
                 total_percentage_allocation=Sum("default_percentage_allocation")
             )["total_percentage_allocation"]
             or 0
@@ -91,12 +96,44 @@ class MultivariateFeatureOptionSerializer(NestedMultivariateFeatureOptionSeriali
 
         if total_percentage_allocation > 100:
             raise ValidationError(
-                {"default_percentage_allocation": "Invalid percentage allocation"}
+                {
+                    "default_percentage_allocation": INVALID_PERCENTAGE_ALLOCATION_MESSAGE
+                }
             )
+        self._validate_feature_state_allocations(
+            feature=feature,
+            default_percentage_allocation=attrs["default_percentage_allocation"],
+        )
 
         self._validate_key_is_unique(attrs)
 
         return attrs
+
+    def _validate_feature_state_allocations(
+        self,
+        *,
+        feature: Feature,
+        default_percentage_allocation: float,
+    ) -> None:
+        if self.instance:
+            return
+        for feature_state in feature.feature_states.filter(
+            identity=None,
+            feature_segment=None,
+        ):
+            try:
+                validate_feature_state_percentage_allocation(
+                    feature_state=feature_state,
+                    percentage_allocation=default_percentage_allocation,
+                )
+            except ValidationError:
+                raise ValidationError(
+                    {
+                        "default_percentage_allocation": (
+                            INVALID_PERCENTAGE_ALLOCATION_MESSAGE
+                        )
+                    }
+                )
 
     def _validate_key_is_unique(self, attrs: dict[str, typing.Any]) -> None:
         key = attrs.get("key")

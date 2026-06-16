@@ -1,16 +1,18 @@
 import typing
 import uuid
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
     validate_slug,
 )
 from django.db import models
+from django.db.models import Sum
 from django_lifecycle import (  # type: ignore[import-untyped]
     AFTER_CREATE,
     AFTER_DELETE,
+    BEFORE_CREATE,
     BEFORE_SAVE,
     LifecycleModelMixin,
     hook,
@@ -28,6 +30,43 @@ if typing.TYPE_CHECKING:
     from environments.models import Environment
     from features.models import FeatureState
     from projects.models import Project
+
+INVALID_PERCENTAGE_ALLOCATION_MESSAGE = "Invalid percentage allocation"
+
+
+def validate_feature_state_percentage_allocation(
+    *,
+    feature_state: "FeatureState",
+    percentage_allocation: float,
+    exclude_mv_fs_value_id: int | None = None,
+) -> None:
+    siblings = MultivariateFeatureStateValue.objects.filter(feature_state=feature_state)
+    if exclude_mv_fs_value_id:
+        siblings = siblings.exclude(id=exclude_mv_fs_value_id)
+    total_sibling_percentage_allocation = (
+        siblings.aggregate(total_percentage_allocation=Sum("percentage_allocation"))[
+            "total_percentage_allocation"
+        ]
+        or 0
+    )
+    if total_sibling_percentage_allocation + percentage_allocation > 100:
+        raise ValidationError(
+            {"percentage_allocation": INVALID_PERCENTAGE_ALLOCATION_MESSAGE}
+        )
+
+
+def validate_feature_state_percentage_allocation_batch(
+    *,
+    feature_state: "FeatureState",
+    multivariate_feature_state_values: typing.Iterable["MultivariateFeatureStateValue"],
+) -> None:
+    total_new_percentage_allocation = sum(
+        mv_value.percentage_allocation for mv_value in multivariate_feature_state_values
+    )
+    validate_feature_state_percentage_allocation(
+        feature_state=feature_state,
+        percentage_allocation=total_new_percentage_allocation,
+    )
 
 
 class MultivariateFeatureOption(
@@ -77,6 +116,10 @@ class MultivariateFeatureOption(
         for feature_state in self.feature.feature_states.filter(
             identity=None, feature_segment=None
         ):
+            validate_feature_state_percentage_allocation(
+                feature_state=feature_state,
+                percentage_allocation=self.default_percentage_allocation,
+            )
             MultivariateFeatureStateValue.objects.create(
                 feature_state=feature_state,
                 multivariate_feature_option=self,
@@ -144,6 +187,17 @@ class MultivariateFeatureStateValue(
         Override validate_unique method, so we can add the BEFORE_SAVE hook.
         """
         super(MultivariateFeatureStateValue, self).validate_unique(exclude=exclude)
+
+    def clean(self) -> None:
+        validate_feature_state_percentage_allocation(
+            feature_state=self.feature_state,
+            percentage_allocation=self.percentage_allocation,
+            exclude_mv_fs_value_id=self.id,
+        )
+
+    @hook(BEFORE_CREATE)
+    def validate_percentage_allocation(self):  # type: ignore[no-untyped-def]
+        self.clean()
 
     def clone(self, feature_state: "FeatureState", persist: bool = True):  # type: ignore[no-untyped-def]
         clone = MultivariateFeatureStateValue(

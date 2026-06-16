@@ -424,6 +424,101 @@ def test_create_mv_option__total_allocation_exceeds_100__returns_bad_request(  #
     "client",
     [lazy_fixture("admin_master_api_key_client"), lazy_fixture("admin_client")],
 )
+def test_create_mv_option__existing_env_default_total_would_exceed_100__returns_bad_request(  # type: ignore[no-untyped-def]
+    project, environment, environment_api_key, client, feature
+):
+    # Given
+    mv_option_url = reverse(
+        "api-v1:projects:feature-mv-options-list",
+        args=[project, feature],
+    )
+    for data in (
+        {
+            "type": "unicode",
+            "feature": feature,
+            "string_value": "off",
+            "default_percentage_allocation": 0,
+        },
+        {
+            "type": "unicode",
+            "feature": feature,
+            "string_value": "on",
+            "default_percentage_allocation": 100,
+        },
+    ):
+        response = client.post(
+            mv_option_url,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+
+    get_feature_states_url = reverse(
+        "api-v1:environments:environment-featurestates-list", args=[environment_api_key]
+    )
+    feature_state = next(
+        filter(
+            lambda fs: fs["feature"] == feature,
+            client.get(get_feature_states_url).json()["results"],
+        )
+    )
+    update_url = reverse(
+        "api-v1:environments:environment-featurestates-detail",
+        args=[environment_api_key, feature_state["id"]],
+    )
+    update_feature_state_response = client.put(
+        update_url,
+        data=json.dumps(
+            {
+                "id": feature_state["id"],
+                "feature_state_value": "off",
+                "multivariate_feature_state_values": [
+                    {
+                        "id": mv_fsv["id"],
+                        "multivariate_feature_option": mv_fsv[
+                            "multivariate_feature_option"
+                        ],
+                        "percentage_allocation": (
+                            100 if mv_fsv["percentage_allocation"] == 0 else 0
+                        ),
+                    }
+                    for mv_fsv in feature_state["multivariate_feature_state_values"]
+                ],
+                "identity": None,
+                "enabled": False,
+                "feature": feature,
+                "environment": environment,
+                "feature_segment": None,
+            }
+        ),
+        content_type="application/json",
+    )
+    assert update_feature_state_response.status_code == status.HTTP_200_OK
+
+    # When
+    response = client.post(
+        mv_option_url,
+        data=json.dumps(
+            {
+                "type": "unicode",
+                "feature": feature,
+                "string_value": "maybe",
+                "default_percentage_allocation": 10,
+            }
+        ),
+        content_type="application/json",
+    )
+
+    # Then
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()["default_percentage_allocation"] == [
+        "Invalid percentage allocation"
+    ]
+
+@pytest.mark.parametrize(
+    "client",
+    [lazy_fixture("admin_master_api_key_client"), lazy_fixture("admin_client")],
+)
 def test_update_mv_option__valid_allocation__returns_updated_option(  # type: ignore[no-untyped-def]
     project, mv_option_50_percent, client, feature
 ):

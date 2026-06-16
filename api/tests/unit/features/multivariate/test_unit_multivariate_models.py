@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
 from environments.identities.models import Identity
@@ -8,6 +9,7 @@ from environments.models import Environment
 from features.feature_types import MULTIVARIATE, STANDARD
 from features.models import Feature, FeatureSegment, FeatureState
 from features.multivariate.models import (
+    INVALID_PERCENTAGE_ALLOCATION_MESSAGE,
     MultivariateFeatureOption,
     MultivariateFeatureStateValue,
 )
@@ -309,3 +311,44 @@ def test_mv_feature_state_value_get_skip_create_audit_log__feature_deleted__retu
     ).first()
 
     assert mvfsv_history_instance.instance.get_skip_create_audit_log() is True
+
+
+def test_mv_feature_state_value_save__total_allocation_over_100__raises_validation_error(
+    multivariate_feature: Feature,
+    environment: Environment,
+) -> None:
+    # Given env-default feature state with multivariate allocations totalling 100%
+    env_default_feature_state = FeatureState.objects.get(
+        feature=multivariate_feature,
+        environment=environment,
+        identity=None,
+        feature_segment=None,
+    )
+    mv_fsvs = list(env_default_feature_state.multivariate_feature_state_values.all())
+    assert len(mv_fsvs) >= 2
+    for mv_fsv in mv_fsvs[1:]:
+        mv_fsv.percentage_allocation = 0
+        mv_fsv.save()
+    mv_fsvs[0].percentage_allocation = 100
+    mv_fsvs[0].save()
+
+    mv_option = MultivariateFeatureOption.objects.create(
+        feature=multivariate_feature,
+        string_value="new-option",
+        default_percentage_allocation=0,
+    )
+    MultivariateFeatureStateValue.objects.filter(
+        feature_state=env_default_feature_state,
+        multivariate_feature_option=mv_option,
+    ).delete()
+
+    # When / Then
+    with pytest.raises(ValidationError) as exc_info:
+        MultivariateFeatureStateValue.objects.create(
+            feature_state=env_default_feature_state,
+            multivariate_feature_option=mv_option,
+            percentage_allocation=1,
+        )
+    assert exc_info.value.message_dict["percentage_allocation"] == [
+        INVALID_PERCENTAGE_ALLOCATION_MESSAGE
+    ]

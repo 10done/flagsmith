@@ -61,7 +61,10 @@ from features.managers import (
     FeatureStateManager,
     FeatureStateValueManager,
 )
-from features.multivariate.models import MultivariateFeatureStateValue
+from features.multivariate.models import (
+    MultivariateFeatureStateValue,
+    validate_feature_state_percentage_allocation_batch,
+)
 from features.signals import feature_state_change_went_live
 from features.utils import (
     get_boolean_from_string,
@@ -699,6 +702,10 @@ class FeatureState(
                 mv_value.clone(feature_state=clone, persist=False)
                 for mv_value in self.multivariate_feature_state_values.all()
             ]
+            validate_feature_state_percentage_allocation_batch(
+                feature_state=clone,
+                multivariate_feature_state_values=mv_values,
+            )
             MultivariateFeatureStateValue.objects.bulk_create(mv_values)
 
         return clone
@@ -855,6 +862,10 @@ class FeatureState(
                 )
                 for mv_option in self.feature.multivariate_options.all()
             ]
+            validate_feature_state_percentage_allocation_batch(
+                feature_state=self,
+                multivariate_feature_state_values=mv_feature_state_values,
+            )
             MultivariateFeatureStateValue.objects.bulk_create(mv_feature_state_values)
 
     @staticmethod
@@ -1116,6 +1127,10 @@ class FeatureState(
                     mv_value.clone(feature_state=target_feature_state, persist=False)
                     for mv_value in source_feature_state.multivariate_feature_state_values.all()
                 ]
+                validate_feature_state_percentage_allocation_batch(
+                    feature_state=target_feature_state,
+                    multivariate_feature_state_values=mv_values,
+                )
                 MultivariateFeatureStateValue.objects.bulk_create(mv_values)
 
             target_feature_state.feature_state_value.copy_from(
