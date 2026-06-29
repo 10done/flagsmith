@@ -9,7 +9,7 @@ import Permission from 'common/providers/Permission'
 import { withRouter } from 'react-router-dom'
 import { getStore } from 'common/store'
 import { removeProjectFlag } from 'common/services/useProjectFlag'
-import { hasMultivariateChange } from 'components/compare-multivariate-utils'
+import { hasMultivariateChange } from 'common/utils/compareMultivariate'
 
 const featureNameWidth = 300
 

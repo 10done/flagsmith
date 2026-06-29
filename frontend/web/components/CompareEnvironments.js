@@ -20,7 +20,7 @@ import { withRouter } from 'react-router-dom'
 import { getDarkMode } from 'project/darkMode'
 import { getStore } from 'common/store'
 import { removeProjectFlag } from 'common/services/useProjectFlag'
-import { hasMultivariateChange } from 'components/compare-multivariate-utils'
+import { hasMultivariateChange } from 'common/utils/compareMultivariate'
 
 const featureNameWidth = 300
 

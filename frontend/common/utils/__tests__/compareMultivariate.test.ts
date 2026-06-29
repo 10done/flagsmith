@@ -1,16 +1,18 @@
 import { FeatureState } from 'common/types/responses'
-import { hasMultivariateChange } from 'components/compare-multivariate-utils'
+import { hasMultivariateChange } from 'common/utils/compareMultivariate'
 
 const featureState = (
   multivariate_feature_state_values: FeatureState['multivariate_feature_state_values'],
 ): FeatureState =>
   ({
     multivariate_feature_state_values,
-  }) as FeatureState
+  } as FeatureState)
 
 describe('hasMultivariateChange', () => {
   it('returns false when both sides have no multivariate values', () => {
-    expect(hasMultivariateChange(featureState([]), featureState([]))).toBe(false)
+    expect(hasMultivariateChange(featureState([]), featureState([]))).toBe(
+      false,
+    )
     expect(hasMultivariateChange(undefined, undefined)).toBe(false)
   })
 
