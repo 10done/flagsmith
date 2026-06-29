@@ -86,7 +86,7 @@ dependencies = [
 
 [project.optional-dependencies]
 private = [
-    "flagsmith-private>=0.9.0,<1",
+    "flagsmith-private>=0.10.0,<1",
 ]
 dev = [
     "django-test-migrations>=1.2.0,<2.0.0",
@@ -133,6 +133,7 @@ dev = [
     # override-dependencies on pydantic strips the email extra. Re-add
     # the transitive deps so poetry.lock parity is preserved.
     "email-validator>=2.0.0",
+    "pyjwt>=2.13.0"
 ]
 
 [build-system]
@@ -155,9 +156,12 @@ explicit = true
 [tool.uv.sources]
 flagsmith-private = { index = "flagsmith-pypi-production" }
 clickhouse-driver = { git = "https://github.com/Flagsmith/clickhouse-driver", branch = "newjson" }
+# TODO: Revert to the PyPI release once a version closing
+# https://github.com/jayvynl/django-clickhouse-backend/issues/154 is published.
+django-clickhouse-backend = { git = "https://github.com/jayvynl/django-clickhouse-backend", rev = "d884c7d" }
 
 [tool.uv]
-required-version = "0.11.18"  # Ensure this matches the version in .pre-commit-config.yaml
+required-version = ">=0.11.18"  # Ensure this matches the version in .pre-commit-config.yaml
 # Pin every resolved package to the exact version that api/poetry.lock used on
 # main before this migration, so the poetry -> uv switch is dependency-neutral.
 # Keep this list in sync with poetry.lock until the lockfile churn settles.
@@ -199,7 +203,6 @@ override-dependencies = [
     "dill==0.3.8",
     "distlib==0.3.9",
     "dj-database-url==3.0.1",
-    "django==5.2.14",
     "django-admin-sso==5.2.0",
     "django-axes==8.1.0",
     "django-cockroachdb==4.2",
@@ -330,7 +333,6 @@ override-dependencies = [
     "pyfakefs==5.7.4",
     "pygithub==2.8.1",
     "pygments==2.19.2",
-    "pyjwt==2.12.0",
     "pylint==2.16.4",
     "pymemcache==4.0.0",
     "pynacl==1.6.2",
@@ -485,6 +487,9 @@ addopts = [
 ]
 console_output_style = 'count'
 log_level = 'INFO'
+markers = [
+  "clickhouse: test requires a live ClickHouse database (see the clickhouse_db fixture)",
+]
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]

@@ -79,6 +79,28 @@ Attributes:
  - `environment_api_key`
  - `environment_id`
 
+### `experimentation.exposures.compute_failed`
+
+Logged at `error` from:
+ - `api/experimentation/tasks.py:100`
+
+Attributes:
+ - `environment.id`
+ - `exc_info`
+ - `experiment.id`
+ - `organisation.id`
+
+### `experimentation.results.compute_failed`
+
+Logged at `error` from:
+ - `api/experimentation/tasks.py:135`
+
+Attributes:
+ - `environment.id`
+ - `exc_info`
+ - `experiment.id`
+ - `organisation.id`
+
 ### `feature_health.feature_health_event_dismissal_not_supported`
 
 Logged at `warning` from:
@@ -107,6 +129,15 @@ Logged at `warning` from:
 
 Attributes:
  - `path`
+
+### `feature_lifecycle.summarised`
+
+Logged at `info` from:
+ - `api/features/feature_lifecycle/views.py:52`
+
+Attributes:
+ - `environment.id`
+ - `organisation.id`
 
 ### `gitlab.api_call.failed`
 
@@ -316,6 +347,15 @@ Attributes:
  - `project_id`
  - `retry_at`
 
+### `mcp.tool.called`
+
+Logged at `info` from:
+ - `api/telemetry/middleware.py:38`
+ - `api/telemetry/middleware.py:40`
+
+Attributes:
+ - `organisation.id`
+
 ### `platform_hub.no_analytics_database_configured`
 
 Logged at `warning` from:
@@ -356,10 +396,19 @@ Attributes:
 ### `segment_membership.compute.segment.skipped`
 
 Logged at `error` from:
- - `api/segment_membership/services.py:96`
+ - `api/segment_membership/services.py:121`
 
 Attributes:
  - `project.id`
+ - `reason`
+ - `segment.id`
+
+### `segment_membership.members.segment.skipped`
+
+Logged at `error` from:
+ - `api/segment_membership/services.py:182`
+
+Attributes:
  - `reason`
  - `segment.id`
 
@@ -394,7 +443,7 @@ Attributes:
 ### `segments.serializers.segment_revision_created`
 
 Logged at `info` from:
- - `api/segments/serializers.py:155`
+ - `api/segments/serializers.py:158`
 
 Attributes:
  - `revision_id`
@@ -441,6 +490,44 @@ Logged at `info` from:
 Attributes:
  - `feature_name`
  - `sentry_action`
+
+### `warehouse.connection.connected`
+
+Logged at `info` from:
+ - `api/experimentation/services.py:684`
+
+Attributes:
+ - `environment.id`
+ - `organisation.id`
+
+### `warehouse.connection.test_event_sent`
+
+Logged at `info` from:
+ - `api/experimentation/services.py:664`
+
+Attributes:
+ - `environment.id`
+ - `organisation.id`
+
+### `warehouse.srm.overallocated`
+
+Logged at `error` from:
+ - `api/experimentation/services.py:392`
+
+Attributes:
+ - `environment.id`
+ - `experiment.id`
+ - `feature.id`
+
+### `warehouse.srm.unkeyed_variant`
+
+Logged at `error` from:
+ - `api/experimentation/services.py:378`
+
+Attributes:
+ - `environment.id`
+ - `experiment.id`
+ - `feature.id`
 
 ### `workflows.change_request.committed`
 

@@ -41,7 +41,6 @@ overrides = [
     { name = "dill", specifier = "==0.3.8" },
     { name = "distlib", specifier = "==0.3.9" },
     { name = "dj-database-url", specifier = "==3.0.1" },
-    { name = "django", specifier = "==5.2.14" },
     { name = "django-admin-sso", specifier = "==5.2.0" },
     { name = "django-axes", specifier = "==8.1.0" },
     { name = "django-cockroachdb", specifier = "==4.2" },
@@ -170,7 +169,6 @@ overrides = [
     { name = "pyfakefs", specifier = "==5.7.4" },
     { name = "pygithub", specifier = "==2.8.1" },
     { name = "pygments", specifier = "==2.19.2" },
-    { name = "pyjwt", specifier = "==2.12.0" },
     { name = "pylint", specifier = "==2.16.4" },
     { name = "pymemcache", specifier = "==4.0.0" },
     { name = "pynacl", specifier = "==1.6.2" },
@@ -843,16 +841,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.2.14"
+version = "5.2.15"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/95/95f7faa0950867afaa0bef2460c6263afd6a2c78cc9434046ed28160b015/django-5.2.14.tar.gz", hash = "sha256:58a63ba841662e5c686b57ba1fec52ddd68c0b93bd96ac3029d55728f00bf8a2", size = 10895118, upload-time = "2026-05-05T13:57:31.104Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/e3/31722f7284c9f43333daff9aee9184678e4487adcb5506af0db8cea09ce1/django-5.2.15.tar.gz", hash = "sha256:5154a9bf84ac01dde011e367f355c07dbb329532e06810dcf3ef2af269e236e7", size = 10873669, upload-time = "2026-06-03T13:03:35.892Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/44/f172870cf87aa25afef48fb72adba89ee8b77fcab6f3b23d240b923f1528/django-5.2.14-py3-none-any.whl", hash = "sha256:6f712143bd3064310d1f50fac859c3e9a274bdcfc9595339853be7779297fc76", size = 8311320, upload-time = "2026-05-05T13:57:25.795Z" },
+    { url = "https://files.pythonhosted.org/packages/92/b5/38140b1643c00d5c46ce69c78e6980fd285aee223100319631bedee4f5e7/django-5.2.15-py3-none-any.whl", hash = "sha256:0eb4a9bb1853a35b0286dbc6d916bd352c8c2687195a7f2d6f80cefd840e4970", size = 8311957, upload-time = "2026-06-03T13:03:31.329Z" },
 ]
 
 [[package]]
@@ -884,14 +882,10 @@ wheels = [
 [[package]]
 name = "django-clickhouse-backend"
 version = "1.6"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/jayvynl/django-clickhouse-backend?rev=d884c7d#d884c7d8d89fd94d79fca440e3965a931aa69435" }
 dependencies = [
     { name = "clickhouse-driver" },
     { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c1/db/55e54cc0793e391ae0f7797f010771ce31348e89629d4db7dec2aebb66f8/django_clickhouse_backend-1.6.tar.gz", hash = "sha256:fd4840b8789f571838fbc8a4c323e9600fed0ee34113fa761ef7a4f231298e10", size = 76500, upload-time = "2026-01-12T06:26:10.073Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/56/995c790c736c2016fe0ae6418a84b65b201bd3134d81e50868d36a43f640/django_clickhouse_backend-1.6-py3-none-any.whl", hash = "sha256:6e1ddba09d7c2bcbb3dd2a9c80606c75c5b42c6f9d220104751857c925a9a5e0", size = 88911, upload-time = "2026-01-12T06:26:08.744Z" },
 ]
 
 [[package]]
@@ -1483,6 +1477,7 @@ dev = [
     { name = "pep8" },
     { name = "pre-commit" },
     { name = "pyfakefs" },
+    { name = "pyjwt" },
     { name = "pylint" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1526,7 +1521,7 @@ requires-dist = [
     { name = "django", specifier = ">=5,<6" },
     { name = "django-admin-sso", specifier = ">=5.2.0,<5.3.0" },
     { name = "django-axes", specifier = ">=8.1.0,<9.0.0" },
-    { name = "django-clickhouse-backend", specifier = ">=1.4,<2.0" },
+    { name = "django-clickhouse-backend", git = "https://github.com/jayvynl/django-clickhouse-backend?rev=d884c7d" },
     { name = "django-cockroachdb", specifier = ">=4.2,<4.3.0" },
     { name = "django-cors-headers", specifier = ">=3.5.0,<3.6.0" },
     { name = "django-debug-toolbar", marker = "extra == 'dev'" },
@@ -1560,7 +1555,7 @@ requires-dist = [
     { name = "flagsmith-common", extras = ["common-core", "flagsmith-schemas", "task-processor"], specifier = ">=3.9.1,<4" },
     { name = "flagsmith-common", extras = ["test-tools"], marker = "extra == 'dev'" },
     { name = "flagsmith-flag-engine", specifier = ">=10.1.0,<11.0.0" },
-    { name = "flagsmith-private", marker = "extra == 'private'", specifier = ">=0.9.0,<1", index = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/" },
+    { name = "flagsmith-private", marker = "extra == 'private'", specifier = ">=0.10.0,<1", index = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/" },
     { name = "flagsmith-sql-flag-engine", specifier = ">=0.1.0,<0.2.0" },
     { name = "google-api-python-client", specifier = ">=1.12.5,<1.13.0" },
     { name = "google-re2", specifier = ">=1.0,<2.0.0" },
@@ -1583,6 +1578,7 @@ requires-dist = [
     { name = "pydantic-collections", specifier = ">=0.6.0,<0.7.0" },
     { name = "pyfakefs", marker = "extra == 'dev'", specifier = ">=5.7.4,<6.0.0" },
     { name = "pygithub", specifier = ">=2.8,<2.9.0" },
+    { name = "pyjwt", marker = "extra == 'dev'", specifier = ">=2.13.0" },
     { name = "pylint", marker = "extra == 'dev'", specifier = ">=2.16.2,<2.17.0" },
     { name = "pymemcache", specifier = ">=4.0.0,<4.1.0" },
     { name = "pyngo", specifier = ">=2.4.1,<2.5.0" },
@@ -1693,7 +1689,7 @@ wheels = [
 
 [[package]]
 name = "flagsmith-private"
-version = "0.9.0"
+version = "0.10.0"
 source = { registry = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/" }
 dependencies = [
     { name = "cryptography" },
@@ -1703,9 +1699,9 @@ dependencies = [
     { name = "pysaml2" },
     { name = "scim2-filter-parser" },
 ]
-sdist = { url = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/flagsmith-private/0.9.0/flagsmith_private-0.9.0.tar.gz", hash = "sha256:fc7b11ff24205f07e8eca8debbbf71807ec1da456a2572df4ec6815a4cce8ade" }
+sdist = { url = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/flagsmith-private/0.10.0/flagsmith_private-0.10.0.tar.gz", hash = "sha256:e5c26a4e8a427147fc630139b55a67dc5e11ebcdc0e67990be9dbc8147511cde", upload-time = "2026-06-25T12:21:20.919Z" }
 wheels = [
-    { url = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/flagsmith-private/0.9.0/flagsmith_private-0.9.0-py3-none-any.whl", hash = "sha256:6e3fa41790af07cc3296cd45c498e73c35f5b8645a59679627e8287717dcdc95" },
+    { url = "https://flagsmith-production-084060095745.d.codeartifact.eu-west-2.amazonaws.com/pypi/flagsmith-pypi-production/simple/flagsmith-private/0.10.0/flagsmith_private-0.10.0-py3-none-any.whl", hash = "sha256:f1efe76ea6f232ae0cb739878685253fea03b06901f0db3bbc41495c3fbf0e2d", upload-time = "2026-06-25T12:21:20.554Z" },
 ]
 
 [[package]]
@@ -2940,7 +2936,7 @@ name = "pygithub"
 version = "2.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pyjwt" },
+    { name = "pyjwt", extra = ["crypto"] },
     { name = "pynacl" },
     { name = "requests" },
     { name = "typing-extensions" },
@@ -2962,11 +2958,19 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.12.0"
+version = "2.13.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a8/10/e8192be5f38f3e8e7e046716de4cae33d56fd5ae08927a823bb916be36c1/pyjwt-2.12.0.tar.gz", hash = "sha256:2f62390b667cd8257de560b850bb5a883102a388829274147f1d724453f8fb02", size = 102511, upload-time = "2026-03-12T17:15:30.831Z" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/70/70f895f404d363d291dcf62c12c85fdd47619ad9674ac0f53364d035925a/pyjwt-2.12.0-py3-none-any.whl", hash = "sha256:9bb459d1bdd0387967d287f5656bf7ec2b9a26645d1961628cda1764e087fd6e", size = 29700, upload-time = "2026-03-12T17:15:29.257Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
+]
+
+[package.optional-dependencies]
+crypto = [
+    { name = "cryptography" },
 ]
 
 [[package]]

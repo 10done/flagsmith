@@ -20,7 +20,12 @@
   }
   &.code-medium {
     .hljs {
-      padding: $input-padding;
+      // Align the single-line editor height with adjacent inputs ($input-height).
+      // Reduced vertical padding so border + line-height + padding == $input-height,
+      // while min-height keeps the empty/placeholder state aligned too. The editor
+      // still grows for multi-line values.
+      padding: 9px 12px 9px 16px;
+      min-height: $input-height;
     }
   }
   textarea {
@@ -157,6 +162,17 @@
   }
   svg {
     vertical-align: sub;
+  }
+}
+
+// Dark CalloutBar variant: white prefix/icon/chevron (via currentColor),
+// gold label. Keeps colours in the design system rather than inline styles.
+.hljs-header.callout-bar--dark {
+  background-color: $primary900;
+  color: white;
+
+  .hljs-description {
+    color: var(--gold-500);
   }
 }
 
